@@ -36,13 +36,16 @@ All data is stored in plain text files:
 
 ## 📂 Project Structure
 
+```plaintext
 LibraryManagementSystem/
-├── model/ # Data models (Book, User, Role)
-├── service/ # Business logic (LibraryService, UserService)
-├── repository/ # File-based storage logic
-├── ui/ # Console-based UI (MainMenu, AdminMenu, UserMenu)
-├── util/ # Utility classes (e.g., HashUtil)
-└── books.txt, users.txt
+├── model/         # Data models (Book, User, Role)
+├── service/       # Business logic (LibraryService, UserService)
+├── repository/    # File-based storage logic
+├── ui/            # Console-based UI (MainMenu, AdminMenu, UserMenu)
+├── util/          # Utility classes (e.g., HashUtil)
+└── data/          
+    ├── books.txt
+    └── users.txt
 
 ---
 
