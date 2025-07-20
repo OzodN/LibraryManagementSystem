@@ -46,7 +46,7 @@ LibraryManagementSystem/
 └── data/          
     ├── books.txt
     └── users.txt
-
+```
 ---
 
 ## 🚀 How to Run
@@ -57,7 +57,7 @@ LibraryManagementSystem/
    git clone https://github.com/OzodN/LibraryManagementSystem.git
    cd LibraryManagementSystem
 3. Open the project in IntelliJ IDEA (or your favorite IDE).
-4. Run the MainMenu class located in the ui package.
+4. Run the Main.java class located in the src package.
 
 👨‍💻 Author
 
