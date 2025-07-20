@@ -30,4 +30,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-
+### Data ###
+/src/data/books.txt
+/src/data/users.txt
