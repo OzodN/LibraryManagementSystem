@@ -31,4 +31,4 @@ bin/
 .DS_Store
 
 ### Data Files ####
-src/data/*.txt
+src/data/*
