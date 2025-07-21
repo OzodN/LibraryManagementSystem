@@ -10,11 +10,15 @@ package ui;
 import model.Book;
 import org.w3c.dom.ls.LSOutput;
 import service.LibraryService;
+import util.InputUtil;
+
 import java.util.Scanner;
 
 public class UserMenu {
     private static final LibraryService libraryService = LibraryService.getInstance();
     private static final Scanner sc = new Scanner(System.in);
+    private static final InputUtil inputUtils = new InputUtil();
+
 
     public void start() {
         while (true) {
@@ -31,7 +35,7 @@ public class UserMenu {
                 choice = Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input! Please enter a number.");
-                return;
+                continue;
             }
 
             switch (choice) {
@@ -44,7 +48,10 @@ public class UserMenu {
                     shutdown();
                     System.exit(0);
                 }
-                default -> System.out.println("Invalid choice.");
+                default -> {
+                    System.out.println("Invalid choice.");
+                    continue;
+                }
             }
         }
     }
@@ -53,7 +60,7 @@ public class UserMenu {
         var books = libraryService.listBooks();
         if (books.isEmpty()) {
             System.out.println("No book available.");
-            pause();
+            inputUtils.pause();
             return;
         }
 
@@ -64,28 +71,27 @@ public class UserMenu {
             i++;
         }
 
-        System.out.print("Enter a book title to get more information (or press Enter to skip): ");
-        String title = sc.nextLine();
-
-        if (!title.isBlank()) {
-            Book found = libraryService.findBookByTitle(title);
-            if (found != null) {
-                System.out.println(found);
-            } else {
-                System.out.println("Book not found.");
-                pause();
-                return;
+        while (true) {
+            System.out.print("Enter a book title to get more information (or press Enter to skip): ");
+            String title = sc.nextLine();
+            if (!title.isBlank()) {
+                Book found = libraryService.findBookByTitle(title);
+                if (found != null) {
+                    System.out.println(found);
+                    break;
+                } else {
+                    System.out.println("Book not found.");
+                    inputUtils.pause();
+                    continue;
+                }
             }
         }
-
-        pause();
+        inputUtils.pause();
     }
 
     private void findBook() {
-        System.out.println("Enter Book ID/Title (or 0 to cancel): ");
-        String input = sc.nextLine();
-
-        if (input.equals("0")) return;
+        String input = inputUtils.promptNonBlank("Enter book ID/Title (or 0 to cancel): ", "ID/Title");
+        if (input == null) return;
 
         Book found = null;
         try {
@@ -98,14 +104,12 @@ public class UserMenu {
         if (found != null) System.out.println("Book found: " + found);
         else System.out.println("Book not found.");
 
-        pause();
+        inputUtils.pause();
     }
 
     private void borrowBook() {
-        System.out.print("Enter book ID/Title to borrow (or 0 to cancel): ");
-        String input = sc.nextLine();
-
-        if (input.equals("0")) return;
+        String input = inputUtils.promptNonBlank("Enter book ID/Title to borrow (or 0 to cancel): ", "ID/Title");
+        if (input == null) return;
 
         Book book = null;
         try {
@@ -119,29 +123,31 @@ public class UserMenu {
             System.out.println(book);
         } else {
             System.out.println("Book not found.");
-            pause();
+            inputUtils.pause();
             return;
         }
 
         if (!book.isAvailable()) {
             System.out.println("This book is already borrowed");
-            pause();
+            inputUtils.pause();
             return;
         }
 
         System.out.println("Do you want to borrow this book? (Y/N): ");
         String confirm = sc.nextLine();
-        if (confirm.equalsIgnoreCase("Y")) libraryService.borrowBookByID(book.getId());
-        else System.out.println("Borrowing canceled.");
+        if (confirm.equalsIgnoreCase("Y")) {
+            libraryService.borrowBookByID(book.getId());
+        }
+        else {
+            System.out.println("Borrowing canceled.");
+        }
 
-        pause();
+        inputUtils.pause();
     }
 
     private void returnBook() {
-        System.out.print("Enter book ID/Title to return (or 0 to cancel): ");
-        String input = sc.nextLine();
-
-        if (input.equals("0")) return;
+        String input = inputUtils.promptNonBlank("Enter book ID/Title to return (or 0 to cancel): ", "ID/Title");
+        if (input == null) return;
 
         Book book = null;
         try {
@@ -155,27 +161,25 @@ public class UserMenu {
             System.out.println(book);
         } else {
             System.out.println("Book not found.");
-            pause();
+            inputUtils.pause();
             return;
         }
 
         if (book.isAvailable()) {
             System.out.println("This book is not currently borrowed.");
-            pause();
+            inputUtils.pause();
             return;
         }
         System.out.println("Do you want to return this book? (Y/N): ");
         String confirm = sc.nextLine();
-        if (confirm.equalsIgnoreCase("Y")) libraryService.returnBookByID(book.getId());
-        else System.out.println("Returning canceled.");
+        if (confirm.equalsIgnoreCase("Y")) {
+            libraryService.returnBookByID(book.getId());
+        }
+        else {
+            System.out.println("Returning canceled.");
+        }
 
-
-        pause();
-    }
-
-    private void pause() {
-        System.out.print("Press ENTER to return to the menu...");
-        sc.nextLine();
+        inputUtils.pause();
     }
 
     private void shutdown() {

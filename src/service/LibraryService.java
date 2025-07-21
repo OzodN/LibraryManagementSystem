@@ -53,6 +53,7 @@ public class LibraryService {
         Book book = findBookByID(id);
         if (book != null) {
             book.setDeleted(true);
+            book.setAvailable(false);
             bookFileRepository.saveBooks(books);
             logger.info("Book marked as deleted.");
         } else logger.warning("Book not found.");

@@ -9,15 +9,17 @@ package ui;
 
 import model.Book;
 import service.LibraryService;
+import util.InputUtil;
 
 import java.util.Scanner;
 
 public class AdminMenu {
     private static final LibraryService libraryService = LibraryService.getInstance();
     private static final Scanner sc = new Scanner(System.in);
+    private static final InputUtil inputUtils = new InputUtil();
+
 
     public void start() {
-
         while (true) {
             System.out.println("\n======= Admin Menu =======" +
                     "\n1. Show all available books" +
@@ -32,7 +34,7 @@ public class AdminMenu {
                 choice = Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input! Please enter a number.");
-                return;
+                continue;
             }
 
             switch (choice) {
@@ -46,7 +48,10 @@ public class AdminMenu {
                     shutdown();
                     System.exit(0);
                 }
-                default -> System.out.println("Invalid choice.");
+                default -> {
+                    System.out.println("Invalid choice.");
+                    continue;
+                }
             }
         }
     }
@@ -55,7 +60,7 @@ public class AdminMenu {
         var books = libraryService.listBooks();
         if (books.isEmpty()) {
             System.out.println("No book available.");
-            pause();
+            inputUtils.pause();
             return;
         }
         System.out.println("\nList of available books: ");
@@ -64,40 +69,40 @@ public class AdminMenu {
             System.out.println(i + ". " + b.getTitle());
             i++;
         }
-
-        System.out.print("Enter a book title to get more information (or press ENTER to skip): ");
-        String title = sc.nextLine();
-        if (!title.isBlank()) {
-            Book found = libraryService.findBookByTitle(title);
-            if (found != null) {
-                System.out.println(found);
-            } else {
-                System.out.println("Book not found.");
-                return;
-            }
-
-            pause();
+        while (true) {
+            System.out.print("Enter a book title to get more information (or press ENTER to skip): ");
+            String title = sc.nextLine();
+            if (!title.isBlank()) {
+                Book found = libraryService.findBookByTitle(title);
+                if (found != null) {
+                    System.out.println(found);
+                    inputUtils.pause();
+                    break;
+                } else {
+                    System.out.println("Book not found. Try again.");
+                    continue;
+                }
+            } else break;
         }
     }
 
-    private void addBook() {
-        System.out.print("Enter book title (or 0 to cancel): ");
-        String title = sc.nextLine();
-        if (title.equals("0")) return;
 
-        System.out.print("Enter book author (or 0 to cancel): ");
-        String author = sc.nextLine();
-        if (author.equals("0")) return;
+    private void addBook() {
+        String title = inputUtils.promptNonBlank("Enter book title (or 0 to cancel): ", "title");
+        if (title == null) return;
+
+        String author = inputUtils.promptNonBlank("Enter book author (or 0 to cancel): ", "author");
+        if (author == null) return;
 
         boolean success = libraryService.addBook(title, author);
         if (success) System.out.println("Book added: " + title + " by " + author);
         else System.out.println("Book already exists.");
 
-        pause();
+        inputUtils.pause();
     }
 
     private void updateBook() {
-        int id = promptInt("Enter book ID (or 0 to cancel): ");
+        int id = inputUtils.promptInt("Enter book ID (or 0 to cancel): ");
         if (id == 0) return;
 
         Book book = libraryService.findBookByID(id);
@@ -105,65 +110,71 @@ public class AdminMenu {
             System.out.println(book);
         } else {
             System.out.println("Book not found.");
-            pause();
+            inputUtils.pause();
             return;
         }
 
-        System.out.println("Do you want to update this book? (Y/N): ");
+        System.out.print("Do you want to update this book? (Y/N): ");
         String confirm = sc.nextLine();
-        if (confirm.equalsIgnoreCase("Y")) {
-            System.out.println("Choose an option: " +
-                    "\n1. Update a whole book" +
-                    "\n2. Update only a title" +
-                    "\n3. Update only an author" +
-                    "\n0. Back to menu");
+        while (true) {
+            if (confirm.equalsIgnoreCase("Y")) {
+                System.out.println("Choose an option: " +
+                        "\n1. Update a whole book" +
+                        "\n2. Update only a title" +
+                        "\n3. Update only an author" +
+                        "\n0. Back to menu");
+                System.out.flush();
+                String input = sc.nextLine();
+                int choice;
+                try {
+                    choice = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input! Please enter a number.");
+                    continue;
+                }
 
-            String input = sc.nextLine();
-            int choice;
-            try {
-                choice = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input! Please enter a number.");
-                return;
+                switch (choice) {
+                    case 1 -> {
+                        String title = inputUtils.promptNonBlank("Enter new book title (or 0 to cancel): ", "title");
+                        if (title == null) break;
+                        String author = inputUtils.promptNonBlank("Enter new book author (or 0 to cancel): ", "author");
+                        if (author == null) break;
+                        libraryService.updateBook(id, title, author);
+                        inputUtils.pause();
+                        break;
+                    }
+                    case 2 -> {
+                        String title = inputUtils.promptNonBlank("Enter new book title (or 0 to cancel): ", "title");
+                        if (title == null) break;
+                        libraryService.updateBookTitle(id, title);
+                        inputUtils.pause();
+                        break;
+                    }
+                    case 3 -> {
+                        String author = inputUtils.promptNonBlank("Enter new book author (or 0 to cancel): ", "author");
+                        if (author == null) break;
+                        libraryService.updateBookAuthor(id, author);
+                        inputUtils.pause();
+                        break;
+                    }
+                    case 0 -> {
+                        return;
+                    }
+                    default -> {
+                        System.out.println("Invalid choice.");
+                        continue;
+                    }
+                }
+            } else {
+                System.out.println("Updating canceled.");
+                break;
             }
-
-            switch (choice) {
-                case 1 -> {
-                    System.out.print("Enter book title (or 0 to cancel): ");
-                    String title = sc.nextLine();
-                    if (title.equals("0")) return;
-                    System.out.print("Enter book author (or 0 to cancel): ");
-                    String author = sc.nextLine();
-                    if (author.equals("0")) return;
-                    libraryService.updateBook(id, title, author);
-                }
-                case 2 -> {
-                    System.out.print("Enter book title (or 0 to cancel): ");
-                    String title = sc.nextLine();
-                    if (title.equals("0")) return;
-                    libraryService.updateBookTitle(id, title);
-                }
-                case 3 -> {
-                    System.out.print("Enter book author (or 0 to cancel): ");
-                    String author = sc.nextLine();
-                    if (author.equals("0")) return;
-                    libraryService.updateBookAuthor(id, author);
-                }
-                case 0 -> {
-                    return;
-                }
-                default -> System.out.println("Invalid choice.");
-            }
-        } else System.out.println("Updating canceled.");
-
-        pause();
+        }
     }
 
     private void findBook() {
-        System.out.print("Enter Book ID/Title (or 0 to cancel): ");
-        String input = sc.nextLine();
-
-        if (input.equals("0")) return;
+        String input = inputUtils.promptNonBlank("Enter book ID/Title (or 0 to cancel): ", "title");
+        if (input == null) return;
 
         Book found = null;
         try {
@@ -177,11 +188,11 @@ public class AdminMenu {
             System.out.println("Book found:\n" + found);
         } else System.out.println("Book not found.");
 
-        pause();
+        inputUtils.pause();
     }
 
     private void removeBook() {
-        int id = promptInt("Enter book ID to remove (or 0 to cancel): ");
+        int id = inputUtils.promptInt("Enter book ID to remove (or 0 to cancel): ");
         if (id == 0) return;
 
         Book book = libraryService.findBookByID(id);
@@ -189,7 +200,7 @@ public class AdminMenu {
             System.out.println(book);
         } else {
             System.out.println("Book not found.");
-            pause();
+            inputUtils.pause();
             return;
         }
         System.out.print("Do you want to remove this book? (Y/N): ");
@@ -201,26 +212,10 @@ public class AdminMenu {
             System.out.println("Removing canceled.");
         }
 
-        pause();
+        inputUtils.pause();
     }
 
     private void shutdown() {
         libraryService.shutdown();
-    }
-
-    private int promptInt(String message) {
-        System.out.print(message);
-        while (!sc.hasNextInt()) {
-            System.out.print("Invalid number. Try again: ");
-            sc.nextLine();
-        }
-        int val = sc.nextInt();
-        sc.nextLine();
-        return val;
-    }
-
-    private void pause() {
-        System.out.print("Press ENTER to return to the menu...");
-        sc.nextLine();
     }
 }

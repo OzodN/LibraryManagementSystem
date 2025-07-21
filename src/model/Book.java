@@ -15,7 +15,7 @@ public class Book {
     private boolean isDeleted;
 
     public Book(int id, String title, String author) {
-        this(id, title, author, true, false);
+        this(id, title, author, true , false);
     }
 
     public Book(int id, String title, String author, boolean isAvailable, boolean isDeleted) {
@@ -28,10 +28,6 @@ public class Book {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -63,23 +59,14 @@ public class Book {
     }
 
     public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+        this.isDeleted = deleted;
     }
-
-/*    public String getBookInfo() {
-        return "Book Info:" +
-                "\n ID: " + id +
-                "\n Book: " + title +
-                "\n author: " + author +
-                "\n Available: " + (isAvailable ? "Yes" : "No") +
-                "\n----------------------";
-    }*/
 
     @Override
     public String toString() {
         return "Book Info:" +
                 "\n ID: " + id +
-                "\n Book: " + title +
+                "\n Title: " + title +
                 "\n author: " + author +
                 "\n Available: " + (isAvailable ? "Yes" : "No") +
                 "\n----------------------";
