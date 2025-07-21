@@ -9,43 +9,73 @@ package service;
 
 import model.Role;
 import model.User;
-import repository.UserFileReposiroty;
+import repository.UserFileRepository;
 import util.HashUtil;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class UserService {
     private static UserService instance;
     private final List<User> users;
-    private final UserFileReposiroty userRepo = new UserFileReposiroty();
+    private final UserFileRepository userRepo = new UserFileRepository();
+    private static final Logger logger = Logger.getLogger(UserService.class.getName());
 
     private UserService() {
         this.users = userRepo.loadUsers();
     }
 
-    public static UserService getInstance() {
+    public static synchronized UserService getInstance() {
         if (instance == null) instance = new UserService();
         return instance;
     }
 
     public User login(String username, String password) {
+
+        if (username == null || username.trim().isBlank()
+                || password == null|| password.isBlank() ) {
+            logger.warning("Logging In failed: empty username or password");
+            return null;
+        }
+
+        String trimmedUsername = username.trim();
+
         String hash = HashUtil.md5(password);
-        for (User u : users) {
-            if (u.getUsername().equalsIgnoreCase(username) && u.getPasswordHash().equals(hash)) {
-                return u;
+        for (User user : users) {
+            if (user.getUsername().equalsIgnoreCase(trimmedUsername)
+                    && user.getPasswordHash().equals(hash)) {
+                logger.info("User logged in: " + trimmedUsername);
+                return user;
             }
         }
+
+        logger.warning("Login failed for user: " + trimmedUsername);
         return null;
     }
 
     public boolean register(String username, String password, Role role) {
-        if (users.stream().anyMatch(user -> user.getUsername().equalsIgnoreCase(username))) {
+        if (username == null || username.trim().isBlank() ||
+                password == null || password.isBlank() ||  role == null) {
+            logger.warning("Registration failed: empty username/password");
             return false;
         }
+
+        String trimmedUsername = username.trim();
+
+        if (password.length() < 6) {
+            logger.warning("Registration failed: password must be > 6 characters");
+            return false;
+        }
+
+        if (users.stream().anyMatch(u ->
+                u.getUsername().equalsIgnoreCase(trimmedUsername))) {
+                logger.warning("Registration failed: username already exists.");
+            return false;
+        }
+
         String hash = HashUtil.md5(password);
-        User newUser = new User(username, hash, role);
+        User newUser = new User(trimmedUsername, hash, role);
         users.add(newUser);
-        userRepo.saveUsers(users);
-        return true;
+        return userRepo.saveUsers(users);
     }
 }

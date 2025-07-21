@@ -7,6 +7,7 @@
 
 package repository;
 
+import com.sun.nio.sctp.IllegalReceiveException;
 import model.User;
 import model.Role;
 
@@ -14,7 +15,7 @@ import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
 
-public class UserFileReposiroty {
+public class UserFileRepository {
     private final String FILE_PATH = "src/data/users.txt";
 
     public List<User> loadUsers() {
@@ -31,17 +32,23 @@ public class UserFileReposiroty {
 
                 String username = parts[0];
                 String passwordHash = parts[1];
-                Role role = Role.valueOf(parts[2].toUpperCase());
+                String roleStr = parts[2].toUpperCase();
 
-                users.add(new User(username, passwordHash, role));
+                try {
+                    Role role = Role.valueOf(roleStr);
+                    users.add(new User(username, passwordHash, role));
+                } catch (IllegalReceiveException e) {
+                    System.out.println("Skipping line due to invalid role: " + line);
+                }
             }
         } catch (IOException e) {
             System.out.println("Failed to load users: " + e.getMessage());
+            e.printStackTrace();
         }
         return users;
     }
 
-    public void saveUsers(List<User> users) {
+    public boolean saveUsers(List<User> users) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (User user : users) {
                 bw.write(user.getUsername() +
@@ -49,9 +56,11 @@ public class UserFileReposiroty {
                         "<<N>>" + user.getRole().name());
                 bw.newLine();
             }
+            return true;
         } catch (IOException e) {
             System.out.println("Error saving users: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 }

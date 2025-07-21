@@ -26,15 +26,22 @@ public class MainMenu {
                     "1. Registration\n" +
                     "2. Login\n" +
                     "0. Exit");
-            int choice = sc.nextInt();
-            sc.nextLine();
+
+            String input = sc.nextLine();
+            int choice;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! Please enter a number.");
+                return;
+            }
 
             switch (choice){
                 case 1 -> register();
                 case 2 -> login();
                 case 0 -> {
                     System.out.println("Goodbye!");
-                    System.exit(0);
+                    return;
                 }
                 default -> System.out.println("Invalid option!");
             }
@@ -42,60 +49,114 @@ public class MainMenu {
     }
 
     private static void register(){
-        System.out.print("Role (ADMIN/USER): ");
-        String roleStr = sc.nextLine();
-        if (roleStr.equals("0")) return;
-        Role role = roleStr.equalsIgnoreCase("ADMIN") ? Role.ADMIN : Role.USER;
+        while (true) {
+            String roleStr = promptNonBlank("Role (ADMIN/USER or 0 to cancel): ", "role");
+            if (roleStr == null) {
+                System.out.println("Registration cancelled.");
+                return;
+            }
 
-        System.out.print("Enter username: ");
-        String username = sc.nextLine();
-        if (username.equals("0")) return;
-        System.out.print("Enter password: ");
-        String password = sc.nextLine();
-        if (password.equals("0")) return;
+            Role role;
+            if (roleStr.equalsIgnoreCase("ADMIN")) {
+                role = Role.ADMIN;
+            } else if (roleStr.equalsIgnoreCase("USER")) {
+                role = Role.USER;
+            } else {
+                System.out.println("Invalid role! Must be ADMIN or USER.");
+                continue;
+            }
 
-        boolean success = authService.register(username, password, role);
+            String username = promptNonBlank("Enter username (or 0 to cancel): ", "username");
+            if (username == null) {
+                System.out.println("Registration cancelled.");
+                return;
+            }
 
-        if (success) {
-            System.out.println("User registered successfully!" +
-                    "\n-----------------------------" +
-                    "\n1. Login" +
-                    "\n0. Exit");
+            String password = promptNonBlank("Enter password (or 0 to cancel): ", "password");
+            if (password == null) {
+                System.out.println("Registration cancelled.");
+                return;
+            }
 
-            int choice = sc.nextInt();
-            sc.nextLine();
+            boolean success = authService.register(username, password, role);
+            if (success) {
+                System.out.println(roleStr.toUpperCase() + " registered successfully!");
+                System.out.println("-----------------------------");
+                System.out.println("1. Login");
+                System.out.println("0. Exit");
 
-            switch (choice) {
-                case 1 -> login();
-                case 0 -> {
-                    System.exit(0);
+                String input = sc.nextLine();
+                int choice;
+                try {
+                    choice = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input! Returning to main menu.");
+                    return;
+                }
+
+                switch (choice) {
+                    case 1 -> login();
+                    case 0 -> {
+                        System.out.println("Goodbye!");
+                        System.exit(0);
+                    }
+                    default -> System.out.println("Invalid option!");
+                }
+            } else {
+                System.out.println("Registration failed. Try again.");
+                System.out.print("Try again? (Y/N): ");
+                String again = sc.nextLine();
+                if (!again.equalsIgnoreCase("Y")) {
+                    System.out.println("Login cancelled.");
+                    return;
                 }
             }
-        }
-        else {
-            System.out.println("Username is already exists!");
-            return;
         }
     }
 
     private static void login() {
-        System.out.print("Enter username: ");
-        String username = sc.nextLine();
-        if (username.equals("0")) return;
-        System.out.print("Enter password: ");
-        String password = sc.nextLine();
-        if (password.equals("0")) return;
+        while (true) {
+            String username = promptNonBlank("Enter username (or 0 to cancel): ", "username");
+            if (username == null) {
+                System.out.println("Login cancelled.");
+                return;
+            }
 
-        User user = authService.login(username, password);
-        if (user != null) {
-            System.out.println("Welcome " + user.getUsername() + "!\n" +
-                    "Role: " + user.getRole());
-            if (user.getRole().equals(Role.ADMIN)) adminMenu.start();
-            else userMenu.start();
+            String password = promptNonBlank("Enter password (or 0 to cancel): ", "password");
+            if (password == null) {
+                System.out.println("Login cancelled.");
+                return;
+            }
+
+            User user = authService.login(username, password);
+            if (user != null) {
+                System.out.println("\nWelcome " + user.getUsername() +
+                        "!\nRole: " + user.getRole());
+                if (user.getRole().equals(Role.ADMIN)) adminMenu.start();
+                else userMenu.start();
+                return;
+            } else {
+                System.out.println("Invalid credentials.");
+                System.out.print("Try again? (Y/N): ");
+                String again = sc.nextLine();
+                if (!again.equalsIgnoreCase("Y")) {
+                    System.out.println("Login cancelled.");
+                    return;
+                }
+            }
         }
-        else {
-            System.out.println("Invalid credentials.");
-            return;
+    }
+
+    private static String promptNonBlank(String promptMessage, String fieldName) {
+        while (true) {
+            System.out.print(promptMessage);
+            String input = sc.nextLine().trim();
+            if (input.equals("0")) return null;
+            if (input.isBlank()) {
+                System.out.println("Please, enter your " + fieldName + "!");
+                continue;
+            }
+            return input;
         }
     }
 }
