@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -125,7 +125,6 @@ public class MainMenu {
             } else {
                 System.out.println("Registration failed. Try again.");
                 System.out.print("Try again? (Y/N): ");
-                System.out.flush();
                 String again = sc.nextLine();
                 if (!again.equalsIgnoreCase("Y")) {
                     System.out.println("Login cancelled.");
@@ -160,7 +159,6 @@ public class MainMenu {
             } else {
                 System.out.println("Invalid credentials.");
                 System.out.print("Try again? (Y/N): ");
-                System.out.flush();
                 String again = sc.nextLine();
                 if (!again.equalsIgnoreCase("Y")) {
                     System.out.println("Login cancelled.");

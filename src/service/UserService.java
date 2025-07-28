@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -55,7 +55,8 @@ public class UserService {
 
     public boolean register(String username, String password, Role role) {
         if (username == null || username.trim().isBlank() ||
-                password == null || password.isBlank() ||  role == null) {
+                password == null || password.isBlank() ||
+                role == null || role.name().trim().isBlank()) {
             logger.warning("Registration failed: empty username/password");
             return false;
         }

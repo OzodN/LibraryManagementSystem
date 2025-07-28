@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -43,7 +43,7 @@ public class UserFileRepository {
             }
         } catch (IOException e) {
             System.out.println("Failed to load users: " + e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace();// you can anable this line for exception analysis
         }
         return users;
     }
@@ -59,7 +59,7 @@ public class UserFileRepository {
             return true;
         } catch (IOException e) {
             System.out.println("Error saving users: " + e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace(); // you can anable this line for exception analysis
             return false;
         }
     }

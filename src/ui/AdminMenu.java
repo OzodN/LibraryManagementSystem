@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -45,7 +45,7 @@ public class AdminMenu {
                 case 5 -> removeBook();
                 case 0 -> {
                     System.out.println("Goodbye!");
-                    shutdown();
+                    libraryService.shutdown();
                     System.exit(0);
                 }
                 default -> {
@@ -141,21 +141,21 @@ public class AdminMenu {
                         if (author == null) break;
                         libraryService.updateBook(id, title, author);
                         inputUtils.pause();
-                        break;
+                        return;
                     }
                     case 2 -> {
                         String title = inputUtils.promptNonBlank("Enter new book title (or 0 to cancel): ", "title");
                         if (title == null) break;
                         libraryService.updateBookTitle(id, title);
                         inputUtils.pause();
-                        break;
+                        return;
                     }
                     case 3 -> {
                         String author = inputUtils.promptNonBlank("Enter new book author (or 0 to cancel): ", "author");
                         if (author == null) break;
                         libraryService.updateBookAuthor(id, author);
                         inputUtils.pause();
-                        break;
+                        return;
                     }
                     case 0 -> {
                         return;
@@ -167,6 +167,7 @@ public class AdminMenu {
                 }
             } else {
                 System.out.println("Updating canceled.");
+                inputUtils.pause();
                 break;
             }
         }
@@ -213,9 +214,5 @@ public class AdminMenu {
         }
 
         inputUtils.pause();
-    }
-
-    private void shutdown() {
-        libraryService.shutdown();
     }
 }

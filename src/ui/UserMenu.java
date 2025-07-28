@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -45,7 +45,7 @@ public class UserMenu {
                 case 4 -> returnBook();
                 case 0 -> {
                     System.out.println("Goodbye!");
-                    shutdown();
+                    libraryService.shutdown();
                     System.exit(0);
                 }
                 default -> {
@@ -180,9 +180,5 @@ public class UserMenu {
         }
 
         inputUtils.pause();
-    }
-
-    private void shutdown() {
-        libraryService.shutdown();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -69,6 +69,7 @@ public class Book {
                 "\n Title: " + title +
                 "\n author: " + author +
                 "\n Available: " + (isAvailable ? "Yes" : "No") +
+                "\n Deleted: " + (isDeleted ? "No" : "Yes") +
                 "\n----------------------";
     }
 }

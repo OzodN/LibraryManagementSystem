@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -74,8 +74,8 @@ public class LibraryService {
         if (book != null) {
             book.setTitle(newTitle);
             bookFileRepository.saveBooks(books);
-            logger.info("The title of a book updated successfully!");
-        } else logger.warning("Could not update a book. Book doesn't exist.");
+            logger.info("The title of the book updated successfully!");
+        } else logger.warning("Could not update the book. Book doesn't exist.");
     }
 
     public void updateBookAuthor(int id, String newAuthor) {
@@ -83,8 +83,8 @@ public class LibraryService {
         if (book != null) {
             book.setAuthor(newAuthor);
             bookFileRepository.saveBooks(books);
-            logger.info("The author of a book updated successfully!");
-        } else logger.warning("Could not update a book. Book doesn't exist.");
+            logger.info("The author of the book updated successfully!");
+        } else logger.warning("Could not update the book. Book doesn't exist.");
     }
 
     public Book findBookByID(int id) {

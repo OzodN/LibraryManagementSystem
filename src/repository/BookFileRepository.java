@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Your Name
+ * Copyright © 2025 Nuritdinov Ozod
  *
  * This code is licensed under the MIT License.
  * See the LICENSE.txt file for details.
@@ -42,7 +42,7 @@ public class BookFileRepository {
             }
         } catch (IOException e) {
             System.out.println("Error reading books file: " + e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace(); // you can anable this line for exception analysis
         }
         return books;
     }
@@ -60,7 +60,7 @@ public class BookFileRepository {
             return true;
         } catch (IOException e) {
             System.out.println("Error writing books file: " + e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace(); // you can anable this line for exception analysis
             return false;
         }
     }
